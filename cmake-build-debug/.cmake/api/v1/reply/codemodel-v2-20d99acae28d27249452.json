@@ -1,0 +1,118 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"build" : "glfw",
+					"childIndexes" : 
+					[
+						2
+					],
+					"jsonFile" : "directory-glfw-Debug-cf58ed5279965a2ab5ce.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "glfw"
+				},
+				{
+					"build" : "glfw/src",
+					"jsonFile" : "directory-glfw.src-Debug-05cc6ab1369fc8fc5a1d.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.1"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 1,
+					"source" : "glfw/src",
+					"targetIndexes" : 
+					[
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Fractal-GLenator",
+					"targetIndexes" : 
+					[
+						0
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1,
+						2
+					],
+					"name" : "GLFW",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "Fractal-GLenator::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Fractal-GLenator-Debug-06eb15d2dda4db18530d.json",
+					"name" : "Fractal-GLenator",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "glfw::@12507ebf64a5258d241e",
+					"jsonFile" : "target-glfw-Debug-1eae273fb85e8b435388.json",
+					"name" : "glfw",
+					"projectIndex" : 1
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug",
+		"source" : "C:/Users/20210707/dev/Fractal-GLenator"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
