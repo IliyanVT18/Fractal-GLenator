@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 3.1 )
 
-project( Fractal-GLenator )
+project( fractal-glenator )
 
 set( OpenGL_GL_PREFERENCE LEGACY )
 
@@ -21,12 +21,12 @@ set( GLFW-CMAKE-STARTER-SRC
      main.cpp
      )
      
-add_executable( Fractal-GLenator WIN32 ${GLFW-CMAKE-STARTER-SRC} )
-target_link_libraries( Fractal-GLenator ${OPENGL_LIBRARIES} glfw )
+add_executable( fractal-glenator WIN32 ${GLFW-CMAKE-STARTER-SRC} )
+target_link_libraries( fractal-glenator ${OPENGL_LIBRARIES} glfw )
 if( MSVC )
     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
-        message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'Fractal-GLenator' as StartUp Project in Visual Studio.\n" )
+        message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'fractal-glenator' as StartUp Project in Visual Studio.\n" )
     else()
-        set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Fractal-GLenator)
+        set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT fractal-glenator)
     endif()
 endif()
