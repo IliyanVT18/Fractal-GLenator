@@ -11,18 +11,17 @@ include_directories( ${OPENGL_INCLUDE_DIRS} )
 set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 
-add_subdirectory( glfw )
+add_subdirectory( include/glfw )
 
 if( MSVC )
     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
 endif()
 
-set( GLFW-CMAKE-STARTER-SRC
-     main.cpp
-     )
+set( SRC src/main.cpp )
+set( GLAD src/glad.c )
      
-add_executable( fractal-glenator WIN32 ${GLFW-CMAKE-STARTER-SRC} )
-target_link_libraries( fractal-glenator ${OPENGL_LIBRARIES} glfw )
+add_executable( fractal-glenator ${GLAD} ${SRC} )
+target_link_libraries( fractal-glenator ${OPENGL_LIBRARIES} GL dl glfw )
 if( MSVC )
     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
         message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'fractal-glenator' as StartUp Project in Visual Studio.\n" )
