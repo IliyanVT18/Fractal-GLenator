@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 3.1 )
 
 project( Fractal-GLenator )
 
+set( OpenGL_GL_PREFERENCE LEGACY )
+
 find_package( OpenGL REQUIRED )
 
 include_directories( ${OPENGL_INCLUDE_DIRS} )
