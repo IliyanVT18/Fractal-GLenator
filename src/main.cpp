@@ -1,22 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <shader/shader.hpp>
 
 #define WIDTH 800
 #define HEIGHT 600
-
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\0";
 
 int main(void)
 {
@@ -50,16 +37,8 @@ int main(void)
         0, 1, 2,    // first triangle
         1, 2, 3     // second triangle
     };
-    
-    uint32_t vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
 
-    uint32_t fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
+    Shader shader("../shaders/shader.vs", "../shaders/shader.fs");
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -78,25 +57,15 @@ int main(void)
 
     // set vertex attribute pointers
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)0);
-	glEnableVertexAttribArray(0);
-
-    uint32_t shaderProgram;
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // we don't need the shaders anymore once we've linked them
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+	glEnableVertexAttribArray(0);   // enable this in layer 0
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
-        glUseProgram(shaderProgram);
+        shader.use();
         glBindVertexArray(VAO);
         glClear(GL_COLOR_BUFFER_BIT);
-		// glDrawArrays(GL_TRIANGLES, 0, 3);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 

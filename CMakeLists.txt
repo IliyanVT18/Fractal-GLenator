@@ -6,7 +6,7 @@ set( OpenGL_GL_PREFERENCE LEGACY )
 
 find_package( OpenGL REQUIRED )
 
-include_directories( ${OPENGL_INCLUDE_DIRS} )
+include_directories( ${OPENGL_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
@@ -19,8 +19,9 @@ endif()
 
 set( SRC src/main.cpp )
 set( GLAD src/glad.c )
+set( SHADER src/shader.cpp )
      
-add_executable( fractal-glenator ${GLAD} ${SRC} )
+add_executable( fractal-glenator ${GLAD} ${SRC} ${SHADER} )
 target_link_libraries( fractal-glenator ${OPENGL_LIBRARIES} GL dl glfw )
 if( MSVC )
     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
