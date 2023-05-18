@@ -1,6 +1,7 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include <glfw/include/GLFW/glfw3.h>
 #include <shader/shader.hpp>
+#include <stb_image/stb_image.h>
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -59,6 +60,20 @@ int main(void)
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)0);
 	glEnableVertexAttribArray(0);   // enable this in layer 0
 
+    // texture shenanigans
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("../textures/warm.png", &width, &height, &nrChannels, 0);
+    uint32_t texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "ERROR::TEXTURE::TEXTURE_NOT_SUCCESSFULLY_READ" << std::endl;
+    }
+    stbi_image_free(data);
+
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
@@ -75,6 +90,10 @@ int main(void)
         /* Poll for and process events */
         glfwPollEvents();
     }
+
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
 
     glfwTerminate();
     return 0;
