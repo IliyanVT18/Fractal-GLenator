@@ -16,7 +16,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 float current_width = (float) WIDTH;
 float current_height = (float) HEIGHT;
 
-float center_x = 1.0f, center_y = 0.5f;
+float center_x = 0.7f, center_y = 0.0f;
 float scale = 2.2f;
 uint32_t iterations = 1000;
 double prev_x, prev_y;
