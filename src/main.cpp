@@ -28,10 +28,11 @@ int main(void)
     glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
     float vertices[] = {
-       -1.0f, -1.0f, 0.0f, // top left
-        1.0f, -1.0f, 0.0f, // top right
-       -1.0f,  1.0f, 0.0f, // bottom left
-        1.0f,  1.0f, 0.0f  // bottom right
+        // positions        // texture coordinates
+       -1.0f, -1.0f, 0.0f,  1.0f, 1.0f,     // top left
+        1.0f, -1.0f, 0.0f,  1.0f, 0.0f,     // top right
+       -1.0f,  1.0f, 0.0f,  0.0f, 0.0f,     // bottom left
+        1.0f,  1.0f, 0.0f,  0.0f, 1.0f      // bottom right
     };  
 
     uint32_t indices[] = {
@@ -39,7 +40,11 @@ int main(void)
         1, 2, 3     // second triangle
     };
 
-    Shader shader("../shaders/shader.vs", "../shaders/shader.fs");
+    Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
+    GLfloat center[2] = { 0.0f, 0.0f };
+    shader.setFloat("scale", 1.0f);
+    shader.setVec2("center", center);
+    shader.setInt("iterations", 100);
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -57,7 +62,7 @@ int main(void)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // set vertex attribute pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)0);
 	glEnableVertexAttribArray(0);   // enable this in layer 0
 
     // texture shenanigans
@@ -73,11 +78,14 @@ int main(void)
         std::cout << "ERROR::TEXTURE::TEXTURE_NOT_SUCCESSFULLY_READ" << std::endl;
     }
     stbi_image_free(data);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float)*5, (void*)(sizeof(float)*3));
+	glEnableVertexAttribArray(1);   // enable this in layer 1
 
     /* Loop until the user closes the window */
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
+        glBindTexture(GL_TEXTURE_2D, texture);
         shader.use();
         glBindVertexArray(VAO);
         glClear(GL_COLOR_BUFFER_BIT);
