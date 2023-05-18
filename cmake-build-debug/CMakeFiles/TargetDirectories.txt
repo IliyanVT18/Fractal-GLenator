@@ -1,8 +1,0 @@
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/CMakeFiles/Fractal-GLenator.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/glfw/CMakeFiles/edit_cache.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/glfw/CMakeFiles/rebuild_cache.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/glfw/src/CMakeFiles/glfw.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/glfw/src/CMakeFiles/edit_cache.dir
-C:/Users/20210707/dev/Fractal-GLenator/cmake-build-debug/glfw/src/CMakeFiles/rebuild_cache.dir
