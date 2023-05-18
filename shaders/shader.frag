@@ -3,15 +3,17 @@ out vec4 FragColor;
 in vec2 TexCoord;
 
 uniform sampler2D tex;
-uniform vec2 center;        // center of the mandelbrot set being rendered
+uniform float center_x;     // center of the mandelbrot set being rendered
+uniform float center_y;
 uniform float scale;        // scale aka zoom factor
 uniform int iterations;     // maximum number of iterations
+uniform float ratio;        // aspect ratio of screen
 
 void main()
 {
     vec2 c, z;
-    c.x = (TexCoord.x - 0.5) * 1.3333 * scale - center.x;   // center and scale x coord
-    c.y = (TexCoord.y - 0.5) * scale - center.y;            // center and scale y coord
+    c.x = (TexCoord.x - 0.5) * ratio * scale - center_x;            // center and scale x coord
+    c.y = (TexCoord.y - 0.5) * scale - center_y;            // center and scale y coord
 
     int i;      // current iteration
     z = c;      // copy c to preserve it
@@ -23,5 +25,5 @@ void main()
         z.x = x;
         z.y = y;
     }
-    FragColor = texture(tex, vec2((i == iterations ? 0.0 : float(i)) / 100.0), 1); 
+    FragColor = texture2D(tex, vec2((i == iterations ? 0.0 : float(i)) / 100.0), 1);
 } 

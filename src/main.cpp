@@ -28,23 +28,21 @@ int main(void)
     glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
     float vertices[] = {
-        // positions        // texture coordinates
-       -1.0f, -1.0f, 0.0f,  1.0f, 1.0f,     // top left
-        1.0f, -1.0f, 0.0f,  1.0f, 0.0f,     // top right
-       -1.0f,  1.0f, 0.0f,  0.0f, 0.0f,     // bottom left
-        1.0f,  1.0f, 0.0f,  0.0f, 1.0f      // bottom right
-    };  
-
-    uint32_t indices[] = {
-        0, 1, 2,    // first triangle
-        1, 2, 3     // second triangle
+        //positions         // texture coordinates
+        1.0f,  1.0f, 0.0f,  1.0f, 1.0f, // top right
+        1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // bottom right
+       -1.0f, -1.0f, 0.0f,  0.0f, 0.0f, // bottom left
+       -1.0f,  1.0f, 0.0f,  0.0f, 1.0f, // top left 
+    };
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
     };
 
     Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
-    GLfloat center[2] = { 0.0f, 0.0f };
-    shader.setFloat("scale", 1.0f);
-    shader.setVec2("center", center);
-    shader.setInt("iterations", 100);
+    float center_x = 0.7f, center_y = 0.0f;
+    float scale = 2.2f;
+    uint32_t iterations = 1000;
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -71,6 +69,9 @@ int main(void)
     uint32_t texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -86,11 +87,15 @@ int main(void)
     {
         /* Render here */
         glBindTexture(GL_TEXTURE_2D, texture);
+        shader.setFloat("scale", scale);
+        shader.setFloat("center_x", center_x);
+        shader.setFloat("center_y", center_y);
+        shader.setInt("iterations", iterations);
+        shader.setFloat("ratio", float(WIDTH) / float(HEIGHT));
         shader.use();
         glBindVertexArray(VAO);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
