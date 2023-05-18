@@ -16,7 +16,7 @@ void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 float current_width = (float) WIDTH;
 float current_height = (float) HEIGHT;
 
-float center_x = 0.7f, center_y = 0.0f;
+float center_x = 1.0f, center_y = 0.5f;
 float scale = 2.2f;
 uint32_t iterations = 1000;
 double prev_x, prev_y;
@@ -61,7 +61,7 @@ int main(void)
         1, 2, 3   // second Triangle
     };
 
-    Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
+    Shader shader("../shaders/vert.shader", "../shaders/frag.shader");
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -174,4 +174,5 @@ void cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     scale *= 1 - (float) yoffset * ZOOM_FACTOR;
+    printf("Scale: %.10f\n", scale);
 }
