@@ -61,7 +61,9 @@ int main(void)
         1, 2, 3   // second Triangle
     };
 
-    Shader shader("../shaders/vert.shader", "../shaders/frag.shader");
+    Shader mandelbrot("../shaders/vert.shader", "../shaders/mandelbrot.shader");
+    Shader phoenix("../shaders/vert.shader", "../shaders/phoenix.shader");
+    Shader *currentShader = &phoenix;
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -106,12 +108,12 @@ int main(void)
     {
         /* Render here */
         glBindTexture(GL_TEXTURE_2D, texture);
-        shader.setFloat("scale", scale);
-        shader.setFloat("center_x", center_x);
-        shader.setFloat("center_y", center_y);
-        shader.setInt("iterations", iterations);
-        shader.setFloat("ratio", current_width / current_height);
-        shader.use();
+        currentShader->setFloat("scale", scale);
+        currentShader->setVec2("center", center_x, center_y);
+        currentShader->setInt("iterations", iterations);
+        currentShader->setFloat("ratio", current_width / current_height);
+        // currentShader->setVec2("p", -0.5f, 0.0f);
+        currentShader->use();
         glBindVertexArray(VAO);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
