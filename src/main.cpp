@@ -5,6 +5,23 @@
 
 #define WIDTH 800
 #define HEIGHT 600
+#define ZOOM_FACTOR 0.1f
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
+void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+
+float current_width = (float) WIDTH;
+float current_height = (float) HEIGHT;
+
+float center_x = 0.7f, center_y = 0.0f;
+float scale = 2.2f;
+uint32_t iterations = 1000;
+double prev_x, prev_y;
+float delta_x, delta_y;
+float tmp_center_x, tmp_center_y;
 
 int main(void)
 {
@@ -16,8 +33,8 @@ int main(void)
 
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(WIDTH, HEIGHT, "Fractal generator", NULL, NULL);
-    if (!window)
-    {
+    if (!window) {
+        std::cout << "Failed to create GLFW window." << std::endl;
         glfwTerminate();
         return -1;
     }
@@ -25,6 +42,11 @@ int main(void)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetScrollCallback(window, scroll_callback);
     glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
     float vertices[] = {
@@ -40,9 +62,6 @@ int main(void)
     };
 
     Shader shader("../shaders/shader.vert", "../shaders/shader.frag");
-    float center_x = 0.7f, center_y = 0.0f;
-    float scale = 2.2f;
-    uint32_t iterations = 1000;
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -65,7 +84,7 @@ int main(void)
 
     // texture shenanigans
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("../textures/warm.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../textures/cold.png", &width, &height, &nrChannels, 0);
     uint32_t texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -91,7 +110,7 @@ int main(void)
         shader.setFloat("center_x", center_x);
         shader.setFloat("center_y", center_y);
         shader.setInt("iterations", iterations);
-        shader.setFloat("ratio", float(WIDTH) / float(HEIGHT));
+        shader.setFloat("ratio", current_width / current_height);
         shader.use();
         glBindVertexArray(VAO);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -110,4 +129,49 @@ int main(void)
 
     glfwTerminate();
     return 0;
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+    // make sure the viewport matches the new window dimensions; note that width and 
+    // height will be significantly larger than specified on retina displays.
+    glViewport(0, 0, width, height);
+    current_width = (float) width;
+    current_height = (float) height;
+}
+
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    switch (key) {
+        case GLFW_KEY_ESCAPE:
+        case GLFW_KEY_Q:
+            if (action == GLFW_PRESS)
+                glfwSetWindowShouldClose(window, true);
+            break;
+
+        default: break;
+    }
+}
+
+void mouse_button_callback(GLFWwindow *window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        glfwGetCursorPos(window, &prev_x, &prev_y);
+        tmp_center_x = center_x;
+        tmp_center_y = center_y;
+    }
+}
+
+void cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        delta_x = xpos - prev_x;
+        delta_y = prev_y - ypos;
+        // convert from screen space to math space
+        delta_x *= (2.0f * scale / current_width);
+        delta_y *= (2.0f * scale / current_height);
+        // apply translation
+        center_x = tmp_center_x + delta_x;
+        center_y = tmp_center_y + delta_y;
+    }
+}
+
+void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
+    scale *= 1 - (float) yoffset * ZOOM_FACTOR;
 }
