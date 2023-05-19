@@ -3,25 +3,38 @@
 #include <shader/shader.hpp>
 #include <stb_image/stb_image.h>
 
+// #define DEBUG
+
 #define WIDTH 800
 #define HEIGHT 600
 #define ZOOM_FACTOR 0.1f
+
+#define JULIA_C 0.5667f
+#define JULIA_P -0.5f
+
+#define CENTER_INIT_X 0.7f
+#define CENTER_INIT_Y 0.0f
+#define SCALE_INIT 3.0f
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 void mouse_button_callback(GLFWwindow *window, int button, int action, int mods);
 void cursor_position_callback(GLFWwindow *window, double xpos, double ypos);
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
+void reset();
 
 float current_width = (float) WIDTH;
 float current_height = (float) HEIGHT;
 
-float center_x = 0.7f, center_y = 0.0f;
-float scale = 2.2f;
+float center_x = CENTER_INIT_X, center_y = CENTER_INIT_Y;
+float scale = SCALE_INIT;
 uint32_t iterations = 1000;
 double prev_x, prev_y;
 float delta_x, delta_y;
 float tmp_center_x, tmp_center_y;
+float p_x = 0.0f, p_y = 0.0f;
+float c_x = 0.0f, c_y = 0.0f;
+bool mandelbrot = true;
 
 int main(void)
 {
@@ -61,9 +74,7 @@ int main(void)
         1, 2, 3   // second Triangle
     };
 
-    Shader mandelbrot("../shaders/vert.shader", "../shaders/mandelbrot.shader");
-    Shader phoenix("../shaders/vert.shader", "../shaders/phoenix.shader");
-    Shader *currentShader = &phoenix;
+    Shader shader("../shaders/vert.shader", "../shaders/frag.shader");
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -108,12 +119,14 @@ int main(void)
     {
         /* Render here */
         glBindTexture(GL_TEXTURE_2D, texture);
-        currentShader->setFloat("scale", scale);
-        currentShader->setVec2("center", center_x, center_y);
-        currentShader->setInt("iterations", iterations);
-        currentShader->setFloat("ratio", current_width / current_height);
-        // currentShader->setVec2("p", -0.5f, 0.0f);
-        currentShader->use();
+        shader.setFloat("scale", scale);
+        shader.setVec2("center", center_x, center_y);
+        shader.setInt("iterations", iterations);
+        shader.setFloat("ratio", current_width / current_height);
+        shader.setVec2("p", p_x, p_y);
+        shader.setVec2("c", c_x, c_y);
+        shader.setBool("mandelbrot", mandelbrot);
+        shader.use();
         glBindVertexArray(VAO);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -149,6 +162,23 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
                 glfwSetWindowShouldClose(window, true);
             break;
 
+        case GLFW_KEY_M:
+            if (action == GLFW_PRESS) {
+                p_x = 0.0f; p_y = 0.0f;
+                mandelbrot = true;
+                reset();
+            }
+            break;
+
+        case GLFW_KEY_J:
+            if (action == GLFW_PRESS) {
+                p_x = JULIA_P; p_y = 0.0f;
+                c_x = JULIA_C; c_y = 0.0f;
+                mandelbrot = false;
+                reset();
+            }
+            break;
+
         default: break;
     }
 }
@@ -176,5 +206,12 @@ void cursor_position_callback(GLFWwindow *window, double xpos, double ypos) {
 
 void scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     scale *= 1 - (float) yoffset * ZOOM_FACTOR;
-    printf("Scale: %.10f\n", scale);
+#ifdef DEBUG
+    printf("Scale: %.10fx\n", 1.0f / scale);
+#endif
+}
+
+void reset() {
+    center_x = CENTER_INIT_X, center_y = CENTER_INIT_Y;
+    scale = SCALE_INIT;
 }
