@@ -2,6 +2,9 @@
 #include <glfw/include/GLFW/glfw3.h>
 #include <shader/shader.hpp>
 #include <stb_image/stb_image.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_glfw.h>
+#include <imgui/imgui_impl_opengl3.h>
 
 // #define DEBUG
 
@@ -15,6 +18,8 @@
 #define CENTER_INIT_X 0.7f
 #define CENTER_INIT_Y 0.0f
 #define SCALE_INIT 3.0f
+
+#define GLSL_VERSION "#version 330 core"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
@@ -35,6 +40,7 @@ float tmp_center_x, tmp_center_y;
 float p_x = 0.0f, p_y = 0.0f;
 float c_x = 0.0f, c_y = 0.0f;
 bool mandelbrot = true;
+static uint8_t selectedFractal;
 
 int main(void)
 {
@@ -61,6 +67,21 @@ int main(void)
     glfwSetCursorPosCallback(window, cursor_position_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(GLSL_VERSION);
 
     float vertices[] = {
         //positions         // texture coordinates
@@ -97,7 +118,7 @@ int main(void)
 
     // texture shenanigans
     int width, height, nrChannels;
-    unsigned char *data = stbi_load("../textures/cold.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../textures/warm.png", &width, &height, &nrChannels, 0);
     uint32_t texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -115,8 +136,60 @@ int main(void)
 	glEnableVertexAttribArray(1);   // enable this in layer 1
 
     /* Loop until the user closes the window */
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
+        /* Start the Dear ImGui frame */
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::Begin("Fractal Generator");
+
+        if (ImGui::RadioButton("Mandelbrot", selectedFractal == 0)) {
+            selectedFractal = 0;
+            mandelbrot = true;
+            reset();
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Julia", selectedFractal == 1)) {
+            selectedFractal = 1;
+            mandelbrot = false;
+            c_x = 0.5667f;
+            c_y = 0.0f;
+            p_x = -0.5f;
+            p_y = 0.0f;
+            reset();
+        }
+        ImGui::SameLine();
+        if (ImGui::RadioButton("Phoenix", selectedFractal == 2)) {
+            selectedFractal = 2;
+            mandelbrot = false;
+            c_x = -0.7f;
+            c_y = 0.27015;
+            p_x = 0.0f;
+            p_y = 0.0f;
+            reset();
+        }
+
+        if (selectedFractal == 2) {
+            ImGui::Text("c");
+            ImGui::SliderFloat("c_x", &c_x, 0.0f, 1.0f);
+            ImGui::SameLine();
+            ImGui::InputFloat("c_x##TextBox", &c_x, 0.0f, 0.0f, "%.3f");
+            ImGui::SliderFloat("c_y", &c_y, 0.0f, 1.0f);
+            ImGui::SameLine();
+            ImGui::InputFloat("c_y##TextBox", &c_y, 0.0f, 0.0f, "%.3f");
+
+            ImGui::Text("p");
+            ImGui::SliderFloat("p_x", &p_x, 0.0f, 1.0f);
+            ImGui::SameLine();
+            ImGui::InputFloat("p_x##TextBox", &p_x, 0.0f, 0.0f, "%.3f");
+            ImGui::SliderFloat("p_y", &p_y, 0.0f, 1.0f);
+            ImGui::SameLine();
+            ImGui::InputFloat("p_y##TextBox", &p_y, 0.0f, 0.0f, "%.3f");
+        }
+
+        ImGui::End();
+        ImGui::Render();
+
         /* Render here */
         glBindTexture(GL_TEXTURE_2D, texture);
         shader.setFloat("scale", scale);
@@ -131,6 +204,9 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        /* Render the ImGui UI */
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
 
@@ -141,8 +217,11 @@ int main(void)
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-
     glfwTerminate();
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     return 0;
 }
 
@@ -160,23 +239,6 @@ void key_callback(GLFWwindow *window, int key, int scancode, int action, int mod
         case GLFW_KEY_Q:
             if (action == GLFW_PRESS)
                 glfwSetWindowShouldClose(window, true);
-            break;
-
-        case GLFW_KEY_M:
-            if (action == GLFW_PRESS) {
-                p_x = 0.0f; p_y = 0.0f;
-                mandelbrot = true;
-                reset();
-            }
-            break;
-
-        case GLFW_KEY_J:
-            if (action == GLFW_PRESS) {
-                p_x = JULIA_P; p_y = 0.0f;
-                c_x = JULIA_C; c_y = 0.0f;
-                mandelbrot = false;
-                reset();
-            }
             break;
 
         default: break;
