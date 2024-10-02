@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 3.5 )
 
 project( fractal-glenator )
 
+set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
+
 set( OpenGL_GL_PREFERENCE LEGACY )
 
 find_package( OpenGL REQUIRED )
